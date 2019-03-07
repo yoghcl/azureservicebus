@@ -1,0 +1,28 @@
+#Blob storage 
+   #specailized account for unstructured data
+#General Purpose V2 Storage
+   #All feature supported Blobs, files, queues, tables
+
+#Pre-requisites
+#Register your resource providers with https://portal.azure.com/#@mabadolaoutlook.onmicrosoft.com/resource/subscriptions/603b9e4b-c4a7-4e6e-a3e1-6d8cc7cc4ce0/resourceproviders
+
+
+#variables
+resourcegroup=demogroup11112
+storageaccount=demostorageaccount111122
+endpoint=https://viewer20190307020247.azurewebsites.net/api/updates
+
+#Create the group
+az group create --name $resourcegroup --location eastus
+
+#Create storage account in Eastus with Local redundency
+az storage account create --name $storageaccount --location eastus --resource-group $resourcegroup --sku Standard_LRS --kind BlobStorage --access-tier Hot
+
+#get storage account key  
+storageid="$(az storage account show --name $storageaccount --resource-group $resourcegroup --query id --output tsv)"
+
+#Before we create an subscription we need to send the messages somewhere ( endpoint) 
+# You use the --subject-begins-with parameter to limit events to ones for a specific resource
+#--subject-ends-with ".jpg"
+
+az eventgrid event-subscription create --resource-id $storageid --name ourstoragesub --endpoint $endpoint
